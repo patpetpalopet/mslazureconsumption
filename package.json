@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "start": "node server"
-  },  
-"license": "Apache",
-"engines": {
+  },
+  "license": "Apache",
+  "engines": {
     "node": "~0.10.0 || ~4.2.0"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
   }
 }

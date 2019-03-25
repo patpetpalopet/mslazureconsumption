@@ -37,7 +37,7 @@ app.get('/customers', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`select * from dbo.Customers`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers `, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -63,10 +63,7 @@ app.get('/customers/:id', (req, res) => {
                 connection.close();
             } else {
                 // console.log(recordset);
-                res.json({
-                    status: 200,
-                    recordset: recordset['recordset'][0]
-                });
+                res.json(recordset);
                 connection.close();
             }
         });
@@ -87,23 +84,6 @@ app.get('/consumption/:enrollment_id', (req, res) => {
                     recordset: recordset['recordset'],
                     rows: recordset['rowsAffected']
                 });
-                connection.close();
-            }
-        });
-    });
-});
-
-app.get('/dept/:id', (req, res) => {
-    var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
-        var request = new sql.Request(connection);
-        request.query(`select * from dbo.dept where deptno=${req.params.id}`, function (erre, recordset) {
-            if (erre) {
-                console.log('ERROR: ', erre);
-                connection.close();
-            } else {
-                // console.log(recordset);
-                res.json(recordset['recordset']);
                 connection.close();
             }
         });

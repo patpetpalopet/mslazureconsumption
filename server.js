@@ -74,7 +74,7 @@ app.get('/consumption/:enrollment_id', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`select * from dbo.[${req.params.enrollment_id}]`, function (erre, recordset) {
+        request.query(`select top 2 * from dbo.[${req.params.enrollment_id}]`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();

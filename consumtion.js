@@ -16,6 +16,7 @@ var sqlConfig = {
 };
 
 function createdTable(_tableName) {
+    console.log('Created table in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
@@ -66,6 +67,7 @@ function createdTable(_tableName) {
                 console.log('ERROR: ', erre);
                 connection.close();
             } else {
+                console.log(`Created table ${_tableName} success!`);
                 console.log(res);
                 connection.close();
             }
@@ -84,8 +86,8 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     }, function (error, response, body) {
         var info = JSON.parse(body);
         var result = info.data;
-        for (var k in info.data) {
-           result[k].cost = ((_markup*result[k].cost)/100)+result[k].cost;
+        for (var i in info.data) {
+            result[i].cost = ((_markup * result[i].cost) / 100) + result[i].cost;
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);
@@ -184,7 +186,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         console.log('ERROR: ', erre);
                         connection.close();
                     } else {
-                        console.log('INSERT success!');
+                        console.log(`INSERT ${recordset.rowsAffected[1]} records success!`);
                         if (info.nextLink) {
                             getAllData(info.nextLink, _tokeninput, _tableInsert);
                         }
@@ -197,23 +199,32 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
 };
 
 function getCustomers(_CustomersId) {
+    console.log('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`select * from dbo.Customers where id=${_CustomersId}`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE id=${_CustomersId}`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
             } else {
-                console.log('GET Customer success!', erre);
                 connection.close();
                 var Token = recordset['recordset'][0].api_key;
                 var enrollment_id = recordset['recordset'][0].enrollment_id;
                 var markup = recordset['recordset'][0].markup;
                 var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetails`;
+
+                console.log('GET Customer success!');
+                // console.log({
+                //     enrollmentNumber: enrollment_id,
+                //     markup: markup,
+                //     token: Token
+                // });
+                console.log('INSERT Consumption in progress....');
                 getAllData(Url, Token, enrollment_id, markup);
             }
         });
     });
 }
+
 getCustomers(2);

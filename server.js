@@ -3,7 +3,6 @@ var express = require('express');
 var sql = require('mssql');
 var bodyParser = require('body-parser');
 var request = require('request');
-var enrollment_status = 'Active';
 var app = express();
 var sqlConfig = {
     user: 'metro',
@@ -28,6 +27,7 @@ app.use(bodyParser.urlencoded());
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Content-Type, X-access-token");
+    res.header("Access-Control-Allow-Headers", "Content-Type, application/json");
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
     res.header("Access-Control-Allow-Credentials", true);
     next();
@@ -89,7 +89,46 @@ app.get('/consumption/:enrollment_id', (req, res) => {
         });
     });
 });
-
+app.post('/addcustomers', (req, res) => {
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function () {
+        var request = new sql.Request(connection);
+        request.query(`INSERT INTO dbo.Customers (
+            [customer_name], 
+            [enrollment_id], 
+            [enrollment_status], 
+            [startdate], 
+            [enddate], 
+            [markup], 
+            [api_effective_start], 
+            [api_effective_end], 
+            [api_key], 
+            [isActive], 
+            [isDelete]
+        ) VALUES (
+            '${req.body.customer_name}',
+            ${req.body.enrollment_id},
+            '${req.body.enrollment_status}',
+            '${req.body.startdate}',
+            '${req.body.enddate}',
+            ${req.body.markup},
+            '${req.body.api_effective_start}',
+            '${req.body.api_effective_end}',
+            '${req.body.api_key}',
+            '${req.body.isActive}',
+            '${req.body.isDelete}'
+        )`, function (erre, recordset) {
+            if (erre) {
+                console.log('ERROR: ', erre);
+                res.json(erre);
+                connection.close();
+            } else {
+                res.json(recordset);
+                connection.close();
+            }
+        });
+    });
+});
 var port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log('Server running at http://localhost:' + port);

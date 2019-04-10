@@ -136,7 +136,7 @@ app.post('/delcustomer', (req, res) => {
         request.query(`
             UPDATE dbo.Customers
             SET isDelete='true'
-            WHERE ID=${req.body.id}
+            WHERE id=${req.body.id}
         `, function (erre, recordset) {
             if (erre) {
                 res.json({

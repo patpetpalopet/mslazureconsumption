@@ -129,19 +129,25 @@ app.post('/addcustomers', (req, res) => {
         });
     });
 });
-app.post('/delcustomers/:enrollment_id', (req, res) => {
+app.post('/delcustomer', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`select top 2 * from dbo.[${req.params.enrollment_id}]`, function (erre, recordset) {
+        request.query(`
+            UPDATE dbo.Customers
+            SET isDelete='true'
+            WHERE ID=${req.body.id}
+        `, function (erre, recordset) {
             if (erre) {
-                console.log('ERROR: ', erre);
+                res.json({
+                    status: 'error',
+                    data: erre
+                });
                 connection.close();
             } else {
                 res.json({
                     status: 200,
-                    recordset: recordset['recordset'],
-                    rows: recordset['rowsAffected']
+                    data: 'delete'
                 });
                 connection.close();
             }

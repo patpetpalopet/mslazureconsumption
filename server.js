@@ -100,8 +100,6 @@ app.post('/addcustomers', (req, res) => {
             [startdate], 
             [enddate], 
             [markup], 
-            [api_effective_start], 
-            [api_effective_end], 
             [api_key], 
             [isActive], 
             [isDelete]
@@ -112,8 +110,6 @@ app.post('/addcustomers', (req, res) => {
             '${req.body.startdate}',
             '${req.body.enddate}',
             ${req.body.markup},
-            '${req.body.api_effective_start}',
-            '${req.body.api_effective_end}',
             '${req.body.api_key}',
             '${req.body.isActive}',
             '${req.body.isDelete}'
@@ -136,6 +132,37 @@ app.post('/delcustomer', (req, res) => {
         request.query(`
             UPDATE dbo.Customers
             SET isDelete='true'
+            WHERE id=${req.body.id}
+        `, function (erre, recordset) {
+            if (erre) {
+                res.json({
+                    status: 'error',
+                    data: erre
+                });
+                connection.close();
+            } else {
+                res.json({
+                    status: 200,
+                    data: 'delete'
+                });
+                connection.close();
+            }
+        });
+    });
+});
+app.post('/updatecustomer', (req, res) => {
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function () {
+        var request = new sql.Request(connection);
+        request.query(`
+            UPDATE dbo.Customers
+            SET customer_name='${req.body.customer_name}',
+                enrollment_id='${req.body.enrollment_id}',
+                enrollment_status='${req.body.enrollment_status}',
+                startdate='${req.body.startdate}',
+                enddate='${req.body.enddate}',
+                markup='${req.body.id}',
+
             WHERE id=${req.body.id}
         `, function (erre, recordset) {
             if (erre) {

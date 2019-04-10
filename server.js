@@ -37,7 +37,7 @@ app.get('/customers', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers `, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE isDelete='false'`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -124,6 +124,25 @@ app.post('/addcustomers', (req, res) => {
                 connection.close();
             } else {
                 res.json(recordset);
+                connection.close();
+            }
+        });
+    });
+});
+app.post('/delcustomers/:enrollment_id', (req, res) => {
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function () {
+        var request = new sql.Request(connection);
+        request.query(`select top 2 * from dbo.[${req.params.enrollment_id}]`, function (erre, recordset) {
+            if (erre) {
+                console.log('ERROR: ', erre);
+                connection.close();
+            } else {
+                res.json({
+                    status: 200,
+                    recordset: recordset['recordset'],
+                    rows: recordset['rowsAffected']
+                });
                 connection.close();
             }
         });

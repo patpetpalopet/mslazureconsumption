@@ -161,8 +161,8 @@ app.post('/updatecustomer', (req, res) => {
                 enrollment_status='${req.body.enrollment_status}',
                 startdate='${req.body.startdate}',
                 enddate='${req.body.enddate}',
-                markup='${req.body.id}',
-
+                markup='${req.body.markup}',
+                api_key='${req.body.api_key}',
             WHERE id=${req.body.id}
         `, function (erre, recordset) {
             if (erre) {

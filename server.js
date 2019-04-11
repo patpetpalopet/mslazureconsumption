@@ -151,18 +151,19 @@ app.post('/delcustomer', (req, res) => {
     });
 });
 app.post('/updatecustomer', (req, res) => {
+    console.log(req.body);
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
         request.query(`
             UPDATE dbo.Customers
             SET customer_name='${req.body.customer_name}',
-                enrollment_id='${req.body.enrollment_id}',
+                enrollment_id=${req.body.enrollment_id},
                 enrollment_status='${req.body.enrollment_status}',
                 startdate='${req.body.startdate}',
                 enddate='${req.body.enddate}',
-                markup='${req.body.markup}',
-                api_key='${req.body.api_key}',
+                markup=${req.body.markup},
+                api_key='${req.body.api_key}'
             WHERE id=${req.body.id}
         `, function (erre, recordset) {
             if (erre) {

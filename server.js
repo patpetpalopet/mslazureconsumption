@@ -167,14 +167,14 @@ app.post('/updatecustomer', (req, res) => {
         `, function (erre, recordset) {
             if (erre) {
                 res.json({
-                    status: 'error',
+                    status: 'Error.',
                     data: erre
                 });
                 connection.close();
             } else {
                 res.json({
                     status: 200,
-                    data: 'delete'
+                    data: 'Updated.'
                 });
                 connection.close();
             }

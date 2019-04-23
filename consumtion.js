@@ -11,7 +11,7 @@ var sqlConfig = {
     pool: {
         max: 10,
         min: 0,
-        idleTimeoutMillis: 1
+        idleTimeoutMillis: 5
     }
 };
 
@@ -20,7 +20,7 @@ function createdTable(_tableName) {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`CREATE TABLE [${_tableName}](
+        request.query(`CREATE TABLE dbo.[${_tableName}](
                        serviceName nvarchar(128),
                        date date,
                        cost float,
@@ -87,7 +87,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
-            result[i].cost = ((_markup * result[i].cost) / 100) + result[i].cost;
+            result[i].consumption_cost = ((_markup * result[i].cost) / 100) + result[i].cost;
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);
@@ -186,7 +186,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         console.log('ERROR: ', erre);
                         connection.close();
                     } else {
-                        console.log(`INSERT ${recordset.rowsAffected[1]} records success!`);
+                        console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);
                         if (info.nextLink) {
                             getAllData(info.nextLink, _tokeninput, _tableInsert);
                         }
@@ -214,17 +214,21 @@ function getCustomers(_CustomersId) {
                 var markup = recordset['recordset'][0].markup;
                 var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetails`;
 
-                console.log('GET Customer success!');
+                console.log(`GET Customer success! in ${enrollment_id}`);
                 // console.log({
                 //     enrollmentNumber: enrollment_id,
                 //     markup: markup,
                 //     token: Token
                 // });
                 console.log('INSERT Consumption in progress....');
+                // console.log(Url, Token, enrollment_id, markup);
                 getAllData(Url, Token, enrollment_id, markup);
             }
         });
     });
 }
 
-getCustomers(2);
+// getCustomers(1);
+// getCustomers(2);
+// getCustomers(3);
+getCustomers(4);

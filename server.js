@@ -15,7 +15,7 @@ var sqlConfig = {
     pool: {
         max: 10,
         min: 0,
-        idleTimeoutMillis: 1
+        idleTimeoutMillis: 5
     }
 };
 
@@ -182,6 +182,69 @@ app.post('/updatecustomer', (req, res) => {
         });
     });
 });
+app.post('/createtable', (req, res) => {
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function () {
+        var request = new sql.Request(connection);
+        request.query(`CREATE TABLE [${_tableName}](
+                       serviceName nvarchar(128),
+                       date date,
+                       cost float,
+                       consumption_cost float,
+                       serviceTier nvarchar(128),
+                       location nvarchar(128),
+                       chargesBilledSeparately bit,
+                       partNumber nvarchar(128),
+                       resourceGuid nvarchar(128),
+                       offerId nvarchar(128),
+                       accountId int,
+                       productId int,
+                       resourceLocationId int,
+                       consumedServiceId int,
+                       departmentId int,
+                       accountOwnerEmail nvarchar(128),
+                       accountName nvarchar(128),
+                       serviceAdministratorId nvarchar(128),
+                       subscriptionId int,
+                       subscriptionGuid nvarchar(128),
+                       subscriptionName nvarchar(128),
+                       product nvarchar(128),
+                       meterId nvarchar(128),
+                       meterCategory nvarchar(128),
+                       meterSubCategory nvarchar(128),
+                       meterRegion nvarchar(128),
+                       meterName nvarchar(128),
+                       consumedQuantity float,
+                       resourceRate float,
+                       resourceLocation nvarchar(128),
+                       consumedService nvarchar(128),
+                       instanceId nvarchar(128),
+                       serviceInfo1 nvarchar(128),
+                       serviceInfo2 nvarchar(128),
+                       additionalInfo nvarchar(128),
+                       tags nvarchar(128),
+                       storeServiceIdentifier nvarchar(128),
+                       departmentName nvarchar(128),
+                       costCenter nvarchar(128),
+                       unitOfMeasure nvarchar(128),
+                       resourceGroup nvarchar(128))
+            `, function (erre, res) {
+            if (erre) {
+                console.log('ERROR: ', erre);
+                connection.close();
+            } else {
+                console.log(`Created table ${_tableName} success!`);
+                console.log(res);
+                connection.close();
+            }
+        });
+    });
+});
+
+function loadConsumtions(){
+
+}
+
 var port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log('Server running at http://localhost:' + port);

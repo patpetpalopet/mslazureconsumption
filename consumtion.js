@@ -76,6 +76,7 @@ function createdTable(_tableName) {
 }
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
+    console.log('INSERT Consumption in progress....');
     request({
         method: 'GET',
         url: _urllink,
@@ -220,7 +221,7 @@ function getCustomers(_CustomersId) {
                 //     markup: markup,
                 //     token: Token
                 // });
-                console.log('INSERT Consumption in progress....');
+                
                 // console.log(Url, Token, enrollment_id, markup);
                 getAllData(Url, Token, enrollment_id, markup);
             }
@@ -231,4 +232,4 @@ function getCustomers(_CustomersId) {
 // getCustomers(1);
 // getCustomers(2);
 // getCustomers(3);
-getCustomers(4);
+// getCustomers(4);

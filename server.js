@@ -119,7 +119,7 @@ app.post('/addcustomers', (req, res) => {
                 res.json(erre);
                 connection.close();
             } else {
-                res.json(recordset);
+                res.json(req.body);
                 connection.close();
             }
         });
@@ -186,7 +186,7 @@ app.post('/createtable', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`CREATE TABLE [${_tableName}](
+        request.query(`CREATE TABLE [${req.body.enrollment_id}](
                        serviceName nvarchar(128),
                        date date,
                        cost float,

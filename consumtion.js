@@ -1,5 +1,7 @@
 var request = require('request');
 var sql = require('mssql');
+var moment = require('moment');
+
 var sqlConfig = {
     user: 'metro',
     password: 'P@ssw0rd',
@@ -84,7 +86,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             'accept': 'application/json',
             'Authorization': `bearer ${_tokeninput}`
         }
-    }, function (error, response, body) {
+    }, function (_error, _response, body) {
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
@@ -199,37 +201,37 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     });
 };
 
-function getCustomers(_CustomersId) {
+function getCustomers() {
     console.log('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE id=${_CustomersId}`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_status!='Inactive' AND isDelete='false'`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
             } else {
                 connection.close();
-                var Token = recordset['recordset'][0].api_key;
-                var enrollment_id = recordset['recordset'][0].enrollment_id;
-                var markup = recordset['recordset'][0].markup;
-                var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetails`;
+                var Customer = recordset.recordset;
+                console.log(Customer);
+                Customer.forEach(function (_item) {
+                    console.log(_item.enrollment_id);
+                    var Token = _item.api_key;
+                    var enrollment_id = _item.enrollment_id;
+                    var markup = _item.markup;
+                    var startTime = moment(_item.startdate).format('YYYY-MM-DD');
+                    var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                    var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
+                    Url += `startTime=${startTime}&endTime=${endTime}`;
+                    getAllData(Url, Token, enrollment_id, markup);
+                });
 
-                console.log(`GET Customer success! in ${enrollment_id}`);
-                // console.log({
-                //     enrollmentNumber: enrollment_id,
-                //     markup: markup,
-                //     token: Token
-                // });
-                
-                // console.log(Url, Token, enrollment_id, markup);
-                getAllData(Url, Token, enrollment_id, markup);
             }
         });
     });
 }
 
-// getCustomers(1);
+getCustomers();
 // getCustomers(2);
 // getCustomers(3);
 // getCustomers(4);

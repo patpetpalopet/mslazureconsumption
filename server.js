@@ -8,7 +8,7 @@ var cron = require('node-cron');
 
 
 // Set Time to Get consumption
-cron.schedule('0 0 0 * * *', function(){
+cron.schedule('0 0 0 * * *', function () {
     getCustomers();
 });
 
@@ -246,7 +246,7 @@ app.post('/createtable', (req, res) => {
                 console.log(`Created table ${_tableName} success!`);
                 res.json(erre);
                 connection.close();
-                getCustomerByID(req.body.id)
+                getCustomerByID(req.body.id);
             }
         });
     });

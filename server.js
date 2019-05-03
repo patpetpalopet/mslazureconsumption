@@ -6,7 +6,7 @@ var request = require('request');
 var app = express();
 var schedule = require('node-schedule');
  
-schedule.scheduleJob('0 59 16 * * *', function(){
+schedule.scheduleJob('0 0 0 * * *', function(){
     getCustomers();
 });
 

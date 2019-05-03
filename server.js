@@ -4,13 +4,13 @@ var sql = require('mssql');
 var bodyParser = require('body-parser');
 var request = require('request');
 var app = express();
-var cron = require('node-cron');
+// var cron = require('node-cron');
 
 
-// Set Time to Get consumption
-cron.schedule('0 0 0 * * *', function(){
-    console.log('running a task every minute');
-});
+// // Set Time to Get consumption
+// cron.schedule('0 0 0 * * *', function(){
+//     console.log('running a task every minute');
+// });
 
 // sql Config
 var sqlConfig = {

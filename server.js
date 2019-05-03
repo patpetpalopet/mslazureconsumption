@@ -405,7 +405,7 @@ function getCustomers() {
         });
     });
 }
-
+// by id
 function getCustomerByID(_idcus) {
     console.log('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);

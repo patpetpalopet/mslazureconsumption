@@ -231,6 +231,31 @@ function getCustomers() {
     });
 }
 
+function getCustomerByID(_idcus) {
+    console.log('GET customers info in progress....');
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function () {
+        var request = new sql.Request(connection);
+        request.query(`SELECT * FROM dbo.Customers WHERE id=${_idcus}`, function (erre, recordset) {
+            if (erre) {
+                console.log('ERROR: ', erre);
+                connection.close();
+            } else {
+                connection.close();
+                var Customer = recordset.recordset[0];
+                console.log(Customer);
+                var Token = Customer.api_key;
+                var enrollment_id = Customer.enrollment_id;
+                var markup = Customer.markup;
+                var startTime = moment(Customer.startdate).format('YYYY-MM-DD');
+                var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
+                Url += `startTime=${startTime}&endTime=${endTime}`;
+                getAllData(Url, Token, enrollment_id, markup);
+            }
+        });
+    });
+}
 getCustomers();
 // getCustomers(2);
 // getCustomers(3);

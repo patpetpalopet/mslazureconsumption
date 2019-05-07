@@ -196,54 +196,57 @@ function createtable(_customerData) {
     connection.connect().then(function () {
         var request = new sql.Request(connection);
         request.query(`CREATE TABLE [${_customerData.enrollment_id}](
-            id int NOT NULL IDENTITY PRIMARY KEY,
-            serviceName nvarchar(255),
-            date date,
-            cost float,
-            consumption_cost float,
-            serviceTier nvarchar(255),
-            location nvarchar(255),
-            chargesBilledSeparately bit,
-            partNumber nvarchar(255),
-            resourceGuid nvarchar(255),
-            offerId nvarchar(255),
-            accountId int,
-            productId int,
-            resourceLocationId int,
-            consumedServiceId int,
-            departmentId int,
-            accountOwnerEmail nvarchar(255),
-            accountName nvarchar(255),
-            serviceAdministratorId nvarchar(255),
-            subscriptionId int,
-            subscriptionGuid nvarchar(255),
-            subscriptionName nvarchar(255),
-            product nvarchar(255),
-            meterId nvarchar(255),
-            meterCategory nvarchar(255),
-            meterSubCategory nvarchar(255),
-            meterRegion nvarchar(255),
-            meterName nvarchar(255),
-            consumedQuantity float,
-            resourceRate float,
-            resourceLocation nvarchar(255),
-            consumedService nvarchar(255),
-            instanceId nvarchar(max),
-            serviceInfo1 nvarchar(255),
-            serviceInfo2 nvarchar(255),
-            additionalInfo nvarchar(255),
-            tags nvarchar(max),
-            storeServiceIdentifier nvarchar(255),
-            departmentName nvarchar(255),
-            costCenter nvarchar(255),
-            unitOfMeasure nvarchar(255),
-            resourceGroup nvarchar(255)
+                id int NOT NULL IDENTITY PRIMARY KEY,
+                serviceName nvarchar(255),
+                date date,
+                cost float,
+                consumption_cost float,
+                serviceTier nvarchar(255),
+                location nvarchar(255),
+                chargesBilledSeparately bit,
+                partNumber nvarchar(255),
+                resourceGuid nvarchar(255),
+                offerId nvarchar(255),
+                accountId int,
+                productId int,
+                resourceLocationId int,
+                consumedServiceId int,
+                departmentId int,
+                accountOwnerEmail nvarchar(255),
+                accountName nvarchar(255),
+                serviceAdministratorId nvarchar(255),
+                subscriptionId int,
+                subscriptionGuid nvarchar(255),
+                subscriptionName nvarchar(255),
+                product nvarchar(255),
+                meterId nvarchar(255),
+                meterCategory nvarchar(255),
+                meterSubCategory nvarchar(255),
+                meterRegion nvarchar(255),
+                meterName nvarchar(255),
+                consumedQuantity float,
+                resourceRate float,
+                resourceLocation nvarchar(255),
+                consumedService nvarchar(255),
+                instanceId nvarchar(max),
+                serviceInfo1 nvarchar(255),
+                serviceInfo2 nvarchar(255),
+                additionalInfo nvarchar(255),
+                tags nvarchar(max),
+                storeServiceIdentifier nvarchar(255),
+                departmentName nvarchar(255),
+                costCenter nvarchar(255),
+                unitOfMeasure nvarchar(255),
+                resourceGroup nvarchar(255)
             )
             `, function (erre, ress) {
             if (erre) {
+                connection.close();
                 console.log('ERROR: ', erre);
             } else {
-                console.log(`Created table ${_tableName} success!`);
+                connection.close();
+                getCustomerByID(_customerData.enrollment_id);
+                console.log(`Created table  success!`);
             }
         });
     });
@@ -315,47 +318,47 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                        ,[resourceGroup])
              SELECT * 
              FROM OPENJSON(@jsonVariable)
-             WITH (serviceName nvarchar(128),
-                       date date,
-                       cost float,
-                       consumption_cost float,
-                       serviceTier nvarchar(128),
-                       location nvarchar(128),
-                       chargesBilledSeparately bit,
-                       partNumber nvarchar(128),
-                       resourceGuid nvarchar(128),
-                       offerId nvarchar(128),
-                       accountId int,
-                       productId int,
-                       resourceLocationId int,
-                       consumedServiceId int,
-                       departmentId int,
-                       accountOwnerEmail nvarchar(128),
-                       accountName nvarchar(128),
-                       serviceAdministratorId nvarchar(128),
-                       subscriptionId int,
-                       subscriptionGuid nvarchar(128),
-                       subscriptionName nvarchar(128),
-                       product nvarchar(128),
-                       meterId nvarchar(128),
-                       meterCategory nvarchar(128),
-                       meterSubCategory nvarchar(128),
-                       meterRegion nvarchar(128),
-                       meterName nvarchar(128),
-                       consumedQuantity float,
-                       resourceRate float,
-                       resourceLocation nvarchar(128),
-                       consumedService nvarchar(128),
-                       instanceId nvarchar(128),
-                       serviceInfo1 nvarchar(128),
-                       serviceInfo2 nvarchar(128),
-                       additionalInfo nvarchar(128),
-                       tags nvarchar(128),
-                       storeServiceIdentifier nvarchar(128),
-                       departmentName nvarchar(128),
-                       costCenter nvarchar(128),
-                       unitOfMeasure nvarchar(128),
-                       resourceGroup nvarchar(128))`,
+             WITH (serviceName nvarchar(255),
+                    date date,
+                    cost float,
+                    consumption_cost float,
+                    serviceTier nvarchar(255),
+                    location nvarchar(255),
+                    chargesBilledSeparately bit,
+                    partNumber nvarchar(255),
+                    resourceGuid nvarchar(255),
+                    offerId nvarchar(255),
+                    accountId int,
+                    productId int,
+                    resourceLocationId int,
+                    consumedServiceId int,
+                    departmentId int,
+                    accountOwnerEmail nvarchar(255),
+                    accountName nvarchar(255),
+                    serviceAdministratorId nvarchar(255),
+                    subscriptionId int,
+                    subscriptionGuid nvarchar(255),
+                    subscriptionName nvarchar(255),
+                    product nvarchar(255),
+                    meterId nvarchar(255),
+                    meterCategory nvarchar(255),
+                    meterSubCategory nvarchar(255),
+                    meterRegion nvarchar(255),
+                    meterName nvarchar(255),
+                    consumedQuantity float,
+                    resourceRate float,
+                    resourceLocation nvarchar(255),
+                    consumedService nvarchar(255),
+                    instanceId nvarchar(max),
+                    serviceInfo1 nvarchar(255),
+                    serviceInfo2 nvarchar(255),
+                    additionalInfo nvarchar(255),
+                    tags nvarchar(max),
+                    storeServiceIdentifier nvarchar(255),
+                    departmentName nvarchar(255),
+                    costCenter nvarchar(255),
+                    unitOfMeasure nvarchar(255),
+                    resourceGroup nvarchar(255))`,
                 function (erre, recordset) {
                     if (erre) {
                         console.log('ERROR: ', erre);
@@ -403,12 +406,12 @@ function getCustomers() {
     });
 }
 
-function getCustomerByID(_idcus) {
+function getCustomerByID(_enrollmentId) {
     console.log('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE id=${_idcus}`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_id=${_idcus}`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();

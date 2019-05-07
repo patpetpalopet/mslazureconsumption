@@ -128,6 +128,7 @@ app.post('/addcustomers', (req, res) => {
             } else {
                 res.json(req.body);
                 connection.close();
+                createtable(req.body);
             }
         });
     });
@@ -189,11 +190,12 @@ app.post('/updatecustomer', (req, res) => {
         });
     });
 });
-app.post('/createtable', (req, res) => {
+
+function createtable(_customerData) {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`CREATE TABLE [${req.body.enrollment_id}](
+        request.query(`CREATE TABLE [${_customerData.enrollment_id}](
             id int NOT NULL IDENTITY PRIMARY KEY,
             serviceName nvarchar(255),
             date date,
@@ -237,19 +239,15 @@ app.post('/createtable', (req, res) => {
             unitOfMeasure nvarchar(255),
             resourceGroup nvarchar(255)
             )
-            `, function (erre, res) {
+            `, function (erre, ress) {
             if (erre) {
                 console.log('ERROR: ', erre);
-                res.json(erre);
-                connection.close();
             } else {
                 console.log(`Created table ${_tableName} success!`);
-                res.json(erre);
-                connection.close();
             }
         });
     });
-});
+}
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     console.log('INSERT Consumption in progress....');

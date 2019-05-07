@@ -5,8 +5,9 @@ var bodyParser = require('body-parser');
 var request = require('request');
 var app = express();
 var schedule = require('node-schedule');
- 
-schedule.scheduleJob('0 0 0 * * *', function(){
+var moment = require('moment');
+
+schedule.scheduleJob('0 0 0 * * *', function () {
     getCustomers();
 });
 
@@ -245,15 +246,15 @@ function createtable(_customerData) {
                 console.log('ERROR: ', erre);
             } else {
                 connection.close();
-                getCustomerByID(_customerData.enrollment_id);
                 console.log(`Created table  success!`);
+                getCustomerByID(_customerData.enrollment_id);
             }
         });
     });
 }
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
-    console.log('INSERT Consumption in progress....');
+    console.log('in INSERT function');
     request({
         method: 'GET',
         url: _urllink,
@@ -262,6 +263,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             'Authorization': `bearer ${_tokeninput}`
         }
     }, function (_error, _response, body) {
+        console.log('GET Consumption id response');
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
@@ -363,12 +365,16 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                     if (erre) {
                         console.log('ERROR: ', erre);
                         connection.close();
+                        console.log('connection close')
                     } else {
                         console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);
+                        connection.close();
+                        console.log('connection close')
                         if (info.nextLink) {
+                            console.log('have nextLink',info.nextLink)
                             getAllData(info.nextLink, _tokeninput, _tableInsert);
                         }
-                        connection.close();
+                     
                     }
                 });
         });
@@ -411,7 +417,7 @@ function getCustomerByID(_enrollmentId) {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_id=${_idcus}`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_id=${_enrollmentId}`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();

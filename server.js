@@ -7,7 +7,7 @@ var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
 // schedule Job
-var j = schedule.scheduleJob('0 32 16 * * *', function () {
+var j = schedule.scheduleJob('0 33 16 * * *', function () {
     // getCustomers();
     request({
         method: 'POST',

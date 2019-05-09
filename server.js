@@ -7,8 +7,27 @@ var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
 // schedule Job
-schedule.scheduleJob('0 0 0 * * *', function () {
-    getCustomers();
+schedule.scheduleJob('0 25 16 * * *', function () {
+    // getCustomers();
+    request({
+        method: 'POST',
+        uri: 'https://notify-api.line.me/api/notify',
+        header: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        auth: {
+          bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
+        },
+        form: {
+          message: 'ทดสอบ', //ข้อความที่จะส่ง
+        },
+      }, (err, httpResponse, body) => {
+        if (err) {
+          console.log(err)
+        } else {
+          console.log(body)
+        }
+      })
 });
 
 // sql Config

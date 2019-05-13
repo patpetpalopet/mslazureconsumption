@@ -6,28 +6,30 @@ var request = require('request');
 var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
+
 // schedule Job utc -7
-var j = schedule.scheduleJob('0 15 3 * * *', function () {
-    // getCustomers();
+var j = schedule.scheduleJob('0 30 17 * * *', function () {
     request({
         method: 'POST',
         uri: 'https://notify-api.line.me/api/notify',
         header: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
         auth: {
-          bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
+            bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
         },
         form: {
-          message: 'กำลังอัพเดตข้อมูล Consumptions...', //ข้อความที่จะส่ง
+            message: 'กำลังอัพเดตข้อมูล Consumptions...', //ข้อความที่จะส่ง
         },
-      }, (err, httpResponse, body) => {
+    }, (err, httpResponse, body) => {
         if (err) {
-          console.log(err)
+            console.log(err)
         } else {
-          console.log(body)
+            console.log(body)
         }
-      })
+    })
+    getCustomers();
+
 });
 
 // sql Config
@@ -286,7 +288,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
-            if(_markup){
+            if (_markup) {
                 result[i].consumption_cost = ((_markup * result[i].cost) / 100) + result[i].cost;
             }
         }
@@ -392,10 +394,30 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         connection.close();
                         console.log('connection close')
                         if (info.nextLink) {
-                            console.log('have nextLink',info.nextLink)
+                            console.log('have nextLink', info.nextLink)
                             getAllData(info.nextLink, _tokeninput, _tableInsert);
+                        } else {
+                            request({
+                                method: 'POST',
+                                uri: 'https://notify-api.line.me/api/notify',
+                                header: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                auth: {
+                                    bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
+                                },
+                                form: {
+                                    message: 'กำลังอัพเดตข้อมูล Consumptions...', //ข้อความที่จะส่ง
+                                },
+                            }, (err, httpResponse, body) => {
+                                if (err) {
+                                    console.log(err)
+                                } else {
+                                    console.log(body)
+                                }
+                            })
                         }
-                     
+
                     }
                 });
         });

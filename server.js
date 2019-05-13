@@ -407,7 +407,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                                     bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
                                 },
                                 form: {
-                                    message: 'กำลังอัพเดตข้อมูล Consumptions...', //ข้อความที่จะส่ง
+                                    message: `บันทึกข้อมูล ${_tableInsert} เสร็จสิ้น.`, //ข้อความที่จะส่ง
                                 },
                             }, (err, httpResponse, body) => {
                                 if (err) {

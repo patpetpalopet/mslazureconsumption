@@ -8,7 +8,7 @@ var schedule = require('node-schedule');
 var moment = require('moment');
 
 // schedule Job utc0
-var j = schedule.scheduleJob('0 28 8 * * *', function () {
+var j = schedule.scheduleJob('59 59 17 * * *', function () {
     getCustomers();
 });
 
@@ -287,7 +287,6 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         }
     }, function (_error, _response, body) {
         console.log('GET Consumption id response');
-        sendLog(`GET Data ${_tableInsert} success!`);
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
@@ -401,7 +400,6 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         } else {
                             sendLog(`INSERT Data ${_tableInsert} success!`);
                         }
-
                     }
                 });
         });
@@ -411,7 +409,6 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
 
 function getCustomers() {
     console.log('GET customers info in progress....');
-    sendLog('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
@@ -429,9 +426,11 @@ function getCustomers() {
                     var enrollment_id = _item.enrollment_id;
                     var markup = _item.markup;
                     // var startTime = moment(_item.startdate).format('YYYY-MM-DD');
-                    var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                    // var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                    var endTime = moment().format('YYYY-MM-DD');
                     var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
                     Url += `startTime=${endTime}&endTime=${endTime}`;
+                    sendLog(`GET data ${enrollment_id}`);
                     getAllData(Url, Token, enrollment_id, markup);
                 });
 
@@ -460,6 +459,7 @@ function getCustomerByID(_enrollmentId) {
                 var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
                 var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
                 Url += `startTime=${startTime}&endTime=${endTime}`;
+
                 getAllData(Url, Token, enrollment_id, markup);
             }
         });

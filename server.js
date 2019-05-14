@@ -8,7 +8,7 @@ var schedule = require('node-schedule');
 var moment = require('moment');
 
 // schedule Job utc0
-var j = schedule.scheduleJob('0 2 8 * * *', function () {
+var j = schedule.scheduleJob('0 3 8 * * *', function () {
     getCustomers();
 });
 
@@ -20,7 +20,7 @@ function sendLog(text) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         auth: {
-            bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
+            bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk', //token
         },
         form: {
             message: text, //ข้อความที่จะส่ง
@@ -33,6 +33,7 @@ function sendLog(text) {
         }
     })
 }
+
 // sql Config
 var sqlConfig = {
     user: 'metro',
@@ -276,7 +277,7 @@ function createtable(_customerData) {
 }
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
-    sendLog(`GET Data ${_tableInsert} in progress....`);
+    // sendLog(`GET Data ${_tableInsert} in progress....`);
     request({
         method: 'GET',
         url: _urllink,
@@ -391,11 +392,9 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         console.log('ERROR: ', erre);
                         sendLog(`INSERT Data ${_tableInsert} ERROR!`);
                         connection.close();
-                        console.log('connection close')
                     } else {
                         console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);
                         connection.close();
-                        console.log('connection close')
                         if (info.nextLink) {
                             console.log('have nextLink', info.nextLink)
                             getAllData(info.nextLink, _tokeninput, _tableInsert);
@@ -429,10 +428,10 @@ function getCustomers() {
                     var Token = _item.api_key;
                     var enrollment_id = _item.enrollment_id;
                     var markup = _item.markup;
-                    var startTime = moment(_item.startdate).format('YYYY-MM-DD');
+                    // var startTime = moment(_item.startdate).format('YYYY-MM-DD');
                     var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
                     var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
-                    Url += `startTime=${startTime}&endTime=${endTime}`;
+                    Url += `startTime=${endTime}&endTime=${endTime}`;
                     getAllData(Url, Token, enrollment_id, markup);
                 });
 

@@ -8,7 +8,7 @@ var schedule = require('node-schedule');
 var moment = require('moment');
 
 // schedule Job utc0
-var j = schedule.scheduleJob('59 59 17 * * *', function () {
+var j = schedule.scheduleJob('0 0 0 * * *', function () {
     getCustomers();
 });
 
@@ -426,8 +426,8 @@ function getCustomers() {
                     var enrollment_id = _item.enrollment_id;
                     var markup = _item.markup;
                     // var startTime = moment(_item.startdate).format('YYYY-MM-DD');
-                    // var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
-                    var endTime = moment().format('YYYY-MM-DD');
+                    var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                    // var endTime = moment().format('YYYY-MM-DD');
                     var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
                     Url += `startTime=${endTime}&endTime=${endTime}`;
                     sendLog(`GET data ${enrollment_id}`);

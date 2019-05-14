@@ -7,29 +7,9 @@ var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
 
-// schedule Job utc -7
+// schedule Job utc0
 var j = schedule.scheduleJob('0 30 17 * * *', function () {
-    request({
-        method: 'POST',
-        uri: 'https://notify-api.line.me/api/notify',
-        header: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        auth: {
-            bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
-        },
-        form: {
-            message: 'กำลังอัพเดตข้อมูล Consumptions...', //ข้อความที่จะส่ง
-        },
-    }, (err, httpResponse, body) => {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log(body)
-        }
-    })
     getCustomers();
-
 });
 
 // sql Config
@@ -100,24 +80,24 @@ app.get('/customers/:id', (req, res) => {
 });
 
 app.get('/consumption/:enrollment_id', (req, res) => {
+    // console.log(req.params.enrollment_id);
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`select top 2 * from dbo.[${req.params.enrollment_id}]`, function (erre, recordset) {
+        request.query(`select top 5000 * from dbo.[${req.params.enrollment_id}]`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
             } else {
                 res.json({
-                    status: 200,
-                    recordset: recordset['recordset'],
-                    rows: recordset['rowsAffected']
+                    "data": recordset['recordset']
                 });
                 connection.close();
             }
         });
     });
 });
+
 app.post('/addcustomers', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
@@ -427,6 +407,25 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
 
 function getCustomers() {
     console.log('GET customers info in progress....');
+    request({
+        method: 'POST',
+        uri: 'https://notify-api.line.me/api/notify',
+        header: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        auth: {
+            bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
+        },
+        form: {
+            message: 'กำลังอัพเดตข้อมูล Consumptions...', //ข้อความที่จะส่ง
+        },
+    }, (err, httpResponse, body) => {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(body)
+        }
+    })
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);

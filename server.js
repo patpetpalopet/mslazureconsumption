@@ -8,10 +8,31 @@ var schedule = require('node-schedule');
 var moment = require('moment');
 
 // schedule Job utc0
-var j = schedule.scheduleJob('0 51 7 * * *', function () {
+var j = schedule.scheduleJob('0 2 8 * * *', function () {
     getCustomers();
 });
 
+function sendLog(text) {
+    request({
+        method: 'POST',
+        uri: 'https://notify-api.line.me/api/notify',
+        header: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        auth: {
+            bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
+        },
+        form: {
+            message: text, //ข้อความที่จะส่ง
+        },
+    }, (err, httpResponse, body) => {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(body)
+        }
+    })
+}
 // sql Config
 var sqlConfig = {
     user: 'metro',
@@ -255,7 +276,7 @@ function createtable(_customerData) {
 }
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
-    console.log('in INSERT function');
+    sendLog(`GET Data ${_tableInsert} in progress....`);
     request({
         method: 'GET',
         url: _urllink,
@@ -265,6 +286,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         }
     }, function (_error, _response, body) {
         console.log('GET Consumption id response');
+        sendLog(`GET Data ${_tableInsert} success!`);
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
@@ -367,6 +389,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                 function (erre, recordset) {
                     if (erre) {
                         console.log('ERROR: ', erre);
+                        sendLog(`INSERT Data ${_tableInsert} ERROR!`);
                         connection.close();
                         console.log('connection close')
                     } else {
@@ -377,25 +400,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                             console.log('have nextLink', info.nextLink)
                             getAllData(info.nextLink, _tokeninput, _tableInsert);
                         } else {
-                            request({
-                                method: 'POST',
-                                uri: 'https://notify-api.line.me/api/notify',
-                                header: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                },
-                                auth: {
-                                    bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
-                                },
-                                form: {
-                                    message: `บันทึกข้อมูล ${_tableInsert} เสร็จสิ้น.`, //ข้อความที่จะส่ง
-                                },
-                            }, (err, httpResponse, body) => {
-                                if (err) {
-                                    console.log(err)
-                                } else {
-                                    console.log(body)
-                                }
-                            })
+                            sendLog(`INSERT Data ${_tableInsert} success!`);
                         }
 
                     }
@@ -407,25 +412,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
 
 function getCustomers() {
     console.log('GET customers info in progress....');
-    request({
-        method: 'POST',
-        uri: 'https://notify-api.line.me/api/notify',
-        header: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        auth: {
-            bearer: 'ELuBQ3SOpHxJmnR8M5dXO7Kd3I7H619UBQGukmx2DEF', //token
-        },
-        form: {
-            message: 'กำลังอัพเดตข้อมูล Consumptions...', //ข้อความที่จะส่ง
-        },
-    }, (err, httpResponse, body) => {
-        if (err) {
-            console.log(err)
-        } else {
-            console.log(body)
-        }
-    })
+    sendLog('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);

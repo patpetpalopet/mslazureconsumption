@@ -8,7 +8,7 @@ var schedule = require('node-schedule');
 var moment = require('moment');
 
 // schedule Job utc0
-var j = schedule.scheduleJob('0 3 8 * * *', function () {
+var j = schedule.scheduleJob('0 25 8 * * *', function () {
     getCustomers();
 });
 

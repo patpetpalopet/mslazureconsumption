@@ -267,9 +267,11 @@ function createtable(_customerData) {
             if (erre) {
                 connection.close();
                 console.log('ERROR: ', erre);
+                sendLog(`Create Table ${_enrollmentId} ERROR: ${erre}`);
             } else {
                 connection.close();
                 console.log(`Created table  success!`);
+                sendLog(`Create Table ${_enrollmentId} success!`);
                 getCustomerByID(_customerData.enrollment_id);
             }
         });
@@ -428,7 +430,7 @@ function getCustomers() {
                     // var endTime = moment().format('YYYY-MM-DD');
                     var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
                     Url += `startTime=${endTime}&endTime=${endTime}`;
-                    sendLog(`GET data ${enrollment_id}`);
+                    sendLog(`GET data ${enrollment_id} success!`);
                     getAllData(Url, Token, enrollment_id, markup);
                 });
 
@@ -439,12 +441,14 @@ function getCustomers() {
 
 function getCustomerByID(_enrollmentId) {
     console.log('GET customers info in progress....');
+    sendLog(`GET data ${_enrollmentId}`);
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
         request.query(`SELECT * FROM dbo.Customers WHERE enrollment_id=${_enrollmentId}`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
+                sendLog(`GET data ${_enrollmentId}`);
                 connection.close();
             } else {
                 connection.close();

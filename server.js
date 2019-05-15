@@ -290,11 +290,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
-            if (_markup) {
-                result[i].consumption_cost = ((_markup * result[i].cost) / 100) + result[i].cost;
-            } else {
-                result[i].consumption_cost = 0;
-            }
+            result[i].consumption_cost = ((_markup * result[i].cost) / 100) + result[i].cost;
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);

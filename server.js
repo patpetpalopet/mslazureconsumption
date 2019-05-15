@@ -292,6 +292,8 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         for (var i in info.data) {
             if (_markup) {
                 result[i].consumption_cost = ((_markup * result[i].cost) / 100) + result[i].cost;
+            } else {
+                result[i].consumption_cost = 0;
             }
         }
         var infoText = JSON.stringify(result);

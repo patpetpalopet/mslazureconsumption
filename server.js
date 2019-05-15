@@ -6,10 +6,7 @@ var request = require('request');
 var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
-import {
-    extendMoment
-} from 'moment-range';
-const moment = extendMoment(Moment);
+
 
 // schedule Job utc0
 var j = schedule.scheduleJob('0 0 0 * * *', function () {

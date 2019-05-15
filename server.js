@@ -460,7 +460,7 @@ function getCustomerByID(_enrollmentId) {
                 var markup = Customer.markup;
                 var startTime = moment(Customer.startdate).format('YYYY-MM-DD');
                 var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
-                var months = moment(startTime).diff(moment(endTime), 'months', true);
+                var months = moment(endTime).diff(moment(startTime), 'months', true);
                 console.log(months);
                 if (months > 27) {
                     endTime = moment(Customer.enddate).format('YYYY-MM-DD');

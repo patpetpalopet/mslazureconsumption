@@ -267,11 +267,11 @@ function createtable(_customerData) {
             if (erre) {
                 connection.close();
                 console.log('ERROR: ', erre);
-                sendLog(`Create Table ${_enrollmentId} ERROR: ${erre}`);
+                sendLog(`Create Table ${_customerData.enrollment_id} ERROR: ${erre}`);
             } else {
                 connection.close();
                 console.log(`Created table  success!`);
-                sendLog(`Create Table ${_enrollmentId} success!`);
+                sendLog(`Create Table ${_customerData.enrollment_id} success!`);
                 getCustomerByID(_customerData.enrollment_id);
             }
         });

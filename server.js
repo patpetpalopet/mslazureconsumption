@@ -6,6 +6,10 @@ var request = require('request');
 var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
+import {
+    extendMoment
+} from 'moment-range';
+const moment = extendMoment(Moment);
 
 // schedule Job utc0
 var j = schedule.scheduleJob('0 0 0 * * *', function () {
@@ -459,9 +463,13 @@ function getCustomerByID(_enrollmentId) {
                 var markup = Customer.markup;
                 var startTime = moment(Customer.startdate).format('YYYY-MM-DD');
                 var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                var months = moment(startTime).diff(moment(endTime), 'months', true);
+                console.log(months);
+                if (months > 27) {
+                    endTime = moment(Customer.enddate).format('YYYY-MM-DD');
+                }
                 var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
                 Url += `startTime=${startTime}&endTime=${endTime}`;
-
                 getAllData(Url, Token, enrollment_id, markup);
             }
         });

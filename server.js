@@ -389,7 +389,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                 function (erre, recordset) {
                     if (erre) {
                         console.log('ERROR: ', erre);
-                        sendLog(`INSERT Data ${_tableInsert} ERROR!`);
+                        sendLog(`INSERT Data ${_tableInsert}  ERROR: ${erre}`);
                         connection.close();
                     } else {
                         console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);

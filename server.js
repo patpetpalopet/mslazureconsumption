@@ -308,7 +308,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             var consuc = ((_markup * result[i].cost) / 100) + result[i].cost;
             var countfo = precision(consuc);
             if (countfo > 16) {
-                sendLog(consuc);
+                sendLog(`cost = ${consuc}  --- id =  ${result[i].id}  `);
             }
             result[i].consumption_cost = consuc;
         }

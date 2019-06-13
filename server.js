@@ -21,7 +21,7 @@ function sendLog(text) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         auth: {
-            bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM', 
+            bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM',
             // bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk', 
         },
         form: {
@@ -308,13 +308,13 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             var consuc = ((_markup * result[i].cost) / 100) + result[i].cost;
             var countfo = precision(consuc);
             if (countfo > 16) {
-                sendLog(`cost = ${consuc} --- id =  ${result[i].meterId}`);
+                // sendLog(`cost = ${consuc} --- id =  ${result[i].meterId}`);
                 consuc = parseFloat(consuc.toFixed(5));
             }
-            
-            if(consuc){
 
-            }else{
+            if (consuc) {
+                sendLog(`sumcost = ${consuc}`);
+            } else {
                 consuc = 0;
             }
             result[i].consumption_cost = consuc;

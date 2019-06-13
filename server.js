@@ -21,7 +21,8 @@ function sendLog(text) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         auth: {
-            bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk', //token
+            bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM', 
+            // bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk', 
         },
         form: {
             message: text, //ข้อความที่จะส่ง
@@ -279,6 +280,17 @@ function createtable(_customerData) {
     });
 }
 
+function precision(a) {
+    if (!isFinite(a)) return 0;
+    var e = 1,
+        p = 0;
+    while (Math.round(a * e) / e !== a) {
+        e *= 10;
+        p++;
+    }
+    return p;
+}
+
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     // sendLog(`GET Data ${_tableInsert} in progress....`);
     request({
@@ -293,7 +305,12 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
-            result[i].consumption_cost = ((_markup * result[i].cost) / 100) + result[i].cost;
+            var consuc = ((_markup * result[i].cost) / 100) + result[i].cost;
+            var countfo = precision(consuc);
+            if (countfo > 16) {
+                sendLog(consuc);
+            }
+            result[i].consumption_cost = consuc;
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);

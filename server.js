@@ -310,10 +310,14 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             if (countfo > 16) {
                 sendLog(`cost = ${consuc} --- id =  ${result[i].meterId}`);
                 consuc = parseFloat(consuc.toFixed(5));
-                consuctype = typeof(consuc);
-                sendLog(`new = ${consuc} type: ${consuctype}`);
             }
-            result[i].consumption_cost = consuc ;
+            
+            if(consuc){
+
+            }else{
+                consuc = 0;
+            }
+            result[i].consumption_cost = consuc;
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);

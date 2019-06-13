@@ -306,17 +306,6 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         var result = info.data;
         for (var i in info.data) {
             var consuc = ((_markup * result[i].cost) / 100) + result[i].cost;
-            var countfo = precision(consuc);
-            if (countfo > 16) {
-                // sendLog(`cost = ${consuc} --- id =  ${result[i].meterId}`);
-                consuc = parseFloat(consuc.toFixed(5));
-            }
-
-            if (consuc) {
-                sendLog(`sumcost = ${consuc}`);
-            } else {
-                consuc = 0;
-            }
             result[i].consumption_cost = consuc;
         }
         var infoText = JSON.stringify(result);
@@ -421,7 +410,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         connection.close();
                         if (info.nextLink) {
                             console.log('have nextLink', info.nextLink)
-                            getAllData(info.nextLink, _tokeninput, _tableInsert);
+                            getAllData(info.nextLink, _tokeninput, _tableInsert,_markup);
                         } else {
                             sendLog(`INSERT Data ${_tableInsert} success!`);
                         }

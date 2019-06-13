@@ -310,7 +310,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             if (countfo > 16) {
                 sendLog(`cost = ${consuc}  --- id =  ${result[i].meterId}  `);
             }
-            result[i].consumption_cost = consuc;
+            result[i].consumption_cost = consuc.toFixed(5);
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);

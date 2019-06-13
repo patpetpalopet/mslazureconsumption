@@ -308,9 +308,12 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             var consuc = ((_markup * result[i].cost) / 100) + result[i].cost;
             var countfo = precision(consuc);
             if (countfo > 16) {
-                sendLog(`cost = ${consuc}  --- id =  ${result[i].meterId}  `);
+                sendLog(`cost = ${consuc} --- id =  ${result[i].meterId}`);
+                consuc = parseFloat(consuc.toFixed(5));
+                consuctype = typeof(consuc);
+                sendLog(`new = ${consuc} type: ${consuctype}`);
             }
-            result[i].consumption_cost = parseFloat(consuc.toFixed(5));
+            result[i].consumption_cost = consuc ;
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);

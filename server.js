@@ -234,15 +234,15 @@ function createtable(_customerData) {
                 partNumber nvarchar(255),
                 resourceGuid nvarchar(255),
                 offerId nvarchar(255),
-                accountId int,
-                productId int,
-                resourceLocationId int,
-                consumedServiceId int,
-                departmentId int,
+                accountId decimal(18,0),
+                productId decimal(18,0),
+                resourceLocationId decimal(18,0),
+                consumedServiceId decimal(18,0),
+                departmentId decimal(18,0),
                 accountOwnerEmail nvarchar(255),
                 accountName nvarchar(255),
                 serviceAdministratorId nvarchar(255),
-                subscriptionId int,
+                subscriptionId decimal(18,0),
                 subscriptionGuid nvarchar(255),
                 subscriptionName nvarchar(255),
                 product nvarchar(255),
@@ -294,6 +294,8 @@ function precision(a) {
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     // sendLog(`GET Data ${_tableInsert} in progress....`);
+    console.log('have data', _tokeninput, _tableInsert, _markup);
+
     request({
         method: 'GET',
         url: _urllink,
@@ -370,15 +372,15 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                     partNumber nvarchar(255),
                     resourceGuid nvarchar(255),
                     offerId nvarchar(255),
-                    accountId int,
-                    productId int,
-                    resourceLocationId int,
-                    consumedServiceId int,
-                    departmentId int,
+                    accountId decimal(18,0),
+                    productId decimal(18,0),
+                    resourceLocationId decimal(18,0),
+                    consumedServiceId decimal(18,0),
+                    departmentId decimal(18,0),
                     accountOwnerEmail nvarchar(255),
                     accountName nvarchar(255),
                     serviceAdministratorId nvarchar(255),
-                    subscriptionId int,
+                    subscriptionId decimal(18,0),
                     subscriptionGuid nvarchar(255),
                     subscriptionName nvarchar(255),
                     product nvarchar(255),
@@ -411,7 +413,8 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         connection.close();
                         if (info.nextLink) {
                             console.log('have nextLink', info.nextLink)
-                            getAllData(info.nextLink, _tokeninput, _tableInsert,_markup);
+                            console.log('have data', _tokeninput, _tableInsert, _markup);
+                            getAllData(info.nextLink, _tokeninput, _tableInsert, _markup);
                         } else {
                             sendLog(`INSERT Data ${_tableInsert} success!`);
                         }

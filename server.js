@@ -9,8 +9,9 @@ var moment = require('moment');
 
 
 // schedule Job utc0
-var j = schedule.scheduleJob('0 0 0 * * *', function () {
-    getCustomers();
+var j = schedule.scheduleJob('0 41 6 * * *', function () {
+    // getCustomers();
+    sendLog(`=========================================================================`);
 });
 
 function sendLog(text) {

@@ -9,7 +9,7 @@ var moment = require('moment');
 
 
 // schedule Job utc0
-var j = schedule.scheduleJob('0 43 6 * * *', function () {
+var j = schedule.scheduleJob('1 1 0 * * *', function () {
     getCustomers();
     // sendLog(`=========================================================================`);
 });

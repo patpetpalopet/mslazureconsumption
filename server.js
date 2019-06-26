@@ -9,7 +9,7 @@ var moment = require('moment');
 
 
 // schedule Job utc0
-var j = schedule.scheduleJob('1 1 0 * * *', function () {
+var j = schedule.scheduleJob('0 0 0 * * *', function () {
     getCustomers();
     // sendLog(`=========================================================================`);
 });
@@ -124,6 +124,7 @@ app.get('/consumption/:enrollment_id', (req, res) => {
 });
 
 app.post('/addcustomers', (req, res) => {
+    console.log(req);
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
@@ -135,6 +136,8 @@ app.post('/addcustomers', (req, res) => {
             [enddate], 
             [markup], 
             [api_key], 
+            [status], 
+            [api_key_expire], 
             [isActive], 
             [isDelete]
         ) VALUES (
@@ -145,6 +148,8 @@ app.post('/addcustomers', (req, res) => {
             '${req.body.enddate}',
             ${req.body.markup},
             '${req.body.api_key}',
+            '${req.body.status}',
+            '${req.body.api_key_expire}',
             '${req.body.isActive}',
             '${req.body.isDelete}'
         )`, function (erre, recordset) {
@@ -153,6 +158,7 @@ app.post('/addcustomers', (req, res) => {
                 res.json(erre);
                 connection.close();
             } else {
+                //สร้าง 
                 createtable(req.body);
                 res.json(req.body);
                 connection.close();
@@ -224,6 +230,7 @@ function createtable(_customerData) {
         var request = new sql.Request(connection);
         request.query(`CREATE TABLE [${_customerData.enrollment_id}](
                 id int NOT NULL IDENTITY PRIMARY KEY,
+                azureconsumptionId nvarchar(255),
                 serviceName nvarchar(255),
                 date date,
                 cost float,
@@ -310,6 +317,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         for (var i in info.data) {
             var consuc = ((_markup * result[i].cost) / 100) + result[i].cost;
             result[i].consumption_cost = consuc;
+            result[i]['azureconsumptionId'] = info.id;
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);
@@ -320,6 +328,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             SET @jsonVariable = N'${infoText}'
             INSERT INTO [dbo].[${_tableInsert}]
                        ([serviceName]
+                       ,[azureconsumptionId]
                        ,[date]
                        ,[cost]
                        ,[consumption_cost]
@@ -363,6 +372,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
              SELECT * 
              FROM OPENJSON(@jsonVariable)
              WITH (serviceName nvarchar(255),
+                    azureconsumptionId nvarchar(255),
                     date date,
                     cost float,
                     consumption_cost float,
@@ -416,12 +426,39 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                             console.log('have data', _tokeninput, _tableInsert, _markup);
                             getAllData(info.nextLink, _tokeninput, _tableInsert, _markup);
                         } else {
+                            updateStatus(_tableInsert, 'Completed');
                             sendLog(`INSERT Data ${_tableInsert} success!`);
                         }
                     }
                 });
         });
 
+    });
+};
+
+function updateStatus(enrollment_id, st) {
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function () {
+        var request = new sql.Request(connection);
+        request.query(`
+            UPDATE dbo.Customers
+            SET status='${st}',
+            WHERE enrollment_id=${enrollment_id}
+        `, function (erre, recordset) {
+            if (erre) {
+                res.json({
+                    status: 'Error.',
+                    data: erre
+                });
+                connection.close();
+            } else {
+                res.json({
+                    status: 200,
+                    data: 'Updated.'
+                });
+                connection.close();
+            }
+        });
     });
 };
 

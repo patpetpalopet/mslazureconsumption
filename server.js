@@ -124,7 +124,6 @@ app.get('/consumption/:enrollment_id', (req, res) => {
 });
 
 app.post('/addcustomers', (req, res) => {
-    console.log(req);
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
@@ -301,8 +300,7 @@ function precision(a) {
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     // sendLog(`GET Data ${_tableInsert} in progress....`);
-    console.log('have data', _tokeninput, _tableInsert, _markup);
-
+    // console.log('have data', _tokeninput, _tableInsert, _markup);
     request({
         method: 'GET',
         url: _urllink,
@@ -418,17 +416,17 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         console.log('ERROR: ', erre);
                         updateStatus(_tableInsert, 'Failure');
                         sendLog(`INSERT Data ${_tableInsert}  ERROR: ${erre}`);
+                        AddLog(_tableInsert, erre, moment().format());
                         connection.close();
                     } else {
                         console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);
                         connection.close();
                         if (info.nextLink) {
-                            console.log('have nextLink', info.nextLink)
-                            console.log('have data', _tokeninput, _tableInsert, _markup);
                             getAllData(info.nextLink, _tokeninput, _tableInsert, _markup);
                         } else {
-                            updateStatus(_tableInsert, 'Completed');
                             sendLog(`INSERT Data ${_tableInsert} success!`);
+                            updateStatus(_tableInsert, 'Completed');
+                            AddLog(_tableInsert, info.id , moment().format());
                         }
                     }
                 });
@@ -437,26 +435,46 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     });
 };
 
+function AddLog(_enrollment_id, _response_data, _time_stamp) {
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function () {
+        var request = new sql.Request(connection);
+        request.query(`INSERT INTO [dbo].[Log]
+        ([enrollment_id]
+        ,[response_data]
+        ,[time_stamp]
+        ) VALUES (
+            ${_enrollment_id},
+            '${_response_data}',
+            '${_time_stamp}'
+        )`, function (erre, recordset) {
+            if (erre) {
+                console.log('ERROR: ', erre);
+                connection.close();
+            } else {
+                //สร้าง 
+                console.log('Completed: ', erre);
+                connection.close();
+            }
+        });
+    });
+};
+
 function updateStatus(enrollment_id, st) {
+    console.log(enrollment_id, typeof (enrollment_id), st, typeof (st));
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
         request.query(`
             UPDATE dbo.Customers
-            SET status='${st}',
+            SET status='${st}'
             WHERE enrollment_id=${enrollment_id}
         `, function (erre, recordset) {
             if (erre) {
-                res.json({
-                    status: 'Error.',
-                    data: erre
-                });
+                console.log(erre);
                 connection.close();
             } else {
-                res.json({
-                    status: 200,
-                    data: 'Updated.'
-                });
+                console.log(recordset);
                 connection.close();
             }
         });
@@ -468,7 +486,7 @@ function getCustomers() {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function () {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_status!='Inactive' AND isDelete='false'`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE status='Completed' AND isDelete='false'`, function (erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();

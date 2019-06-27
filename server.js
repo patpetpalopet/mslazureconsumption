@@ -7,9 +7,11 @@ var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
 
-
+const appInsights = require("applicationinsights");
+appInsights.setup("c908f080-bab0-4370-af22-32d5a754f598");
+appInsights.start();
 // schedule Job utc0
-var j = schedule.scheduleJob('0 0 0 * * *', function () {
+var j = schedule.scheduleJob('0 0 0 * * *', function() {
     getCustomers();
     // sendLog(`=========================================================================`);
 });
@@ -58,7 +60,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 
 // set Origin
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Content-Type, X-access-token");
     res.header("Access-Control-Allow-Headers", "Content-Type, application/json");
@@ -69,9 +71,9 @@ app.use(function (req, res, next) {
 
 app.get('/customers', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE isDelete='false'`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE isDelete='false'`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -89,9 +91,9 @@ app.get('/customers', (req, res) => {
 
 app.get('/customers/:id', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`select * from dbo.Customers where id=${req.params.id}`, function (erre, recordset) {
+        request.query(`select * from dbo.Customers where id=${req.params.id}`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -107,9 +109,9 @@ app.get('/customers/:id', (req, res) => {
 app.get('/consumption/:enrollment_id', (req, res) => {
     // console.log(req.params.enrollment_id);
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`select * from dbo.[${req.params.enrollment_id}]`, function (erre, recordset) {
+        request.query(`select * from dbo.[${req.params.enrollment_id}]`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -125,7 +127,7 @@ app.get('/consumption/:enrollment_id', (req, res) => {
 
 app.post('/addcustomers', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
         request.query(`INSERT INTO dbo.Customers (
             [customer_name], 
@@ -151,7 +153,7 @@ app.post('/addcustomers', (req, res) => {
             '${req.body.api_key_expire}',
             '${req.body.isActive}',
             '${req.body.isDelete}'
-        )`, function (erre, recordset) {
+        )`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 res.json(erre);
@@ -167,13 +169,13 @@ app.post('/addcustomers', (req, res) => {
 });
 app.post('/delcustomer', (req, res) => {
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
         request.query(`
             UPDATE dbo.Customers
             SET isDelete='true'
             WHERE id=${req.body.id}
-        `, function (erre, recordset) {
+        `, function(erre, recordset) {
             if (erre) {
                 res.json({
                     status: 'error',
@@ -193,7 +195,7 @@ app.post('/delcustomer', (req, res) => {
 app.post('/updatecustomer', (req, res) => {
     console.log(req.body);
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
         request.query(`
             UPDATE dbo.Customers
@@ -205,7 +207,7 @@ app.post('/updatecustomer', (req, res) => {
                 markup=${req.body.markup},
                 api_key='${req.body.api_key}'
             WHERE id=${req.body.id}
-        `, function (erre, recordset) {
+        `, function(erre, recordset) {
             if (erre) {
                 res.json({
                     status: 'Error.',
@@ -225,7 +227,7 @@ app.post('/updatecustomer', (req, res) => {
 
 function createtable(_customerData) {
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
         request.query(`CREATE TABLE [${_customerData.enrollment_id}](
                 id int NOT NULL IDENTITY PRIMARY KEY,
@@ -272,7 +274,7 @@ function createtable(_customerData) {
                 unitOfMeasure nvarchar(255),
                 resourceGroup nvarchar(255)
             )
-            `, function (erre, ress) {
+            `, function(erre, ress) {
             if (erre) {
                 connection.close();
                 console.log('ERROR: ', erre);
@@ -300,16 +302,18 @@ function precision(a) {
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     // sendLog(`GET Data ${_tableInsert} in progress....`);
-    // console.log('have data', _tokeninput, _tableInsert, _markup);
+    console.log(_urllink, _tokeninput, _tableInsert, _markup);
     request({
         method: 'GET',
         url: _urllink,
         headers: {
             'accept': 'application/json',
-            'Authorization': `bearer ${_tokeninput}`
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${_tokeninput}`
         }
-    }, function (_error, _response, body) {
+    }, function(_error, _response, body) {
         console.log('GET Consumption id response');
+        console.log(_error, _response, body);
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
@@ -319,7 +323,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);
-        connection.connect().then(function () {
+        connection.connect().then(function() {
             var request = new sql.Request(connection);
             request.query(`USE [AzureConsumption]
             DECLARE @jsonVariable NVARCHAR(MAX)
@@ -411,7 +415,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                     costCenter nvarchar(255),
                     unitOfMeasure nvarchar(255),
                     resourceGroup nvarchar(255))`,
-                function (erre, recordset) {
+                function(erre, recordset) {
                     if (erre) {
                         console.log('ERROR: ', erre);
                         updateStatus(_tableInsert, 'Failure');
@@ -426,7 +430,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                         } else {
                             sendLog(`INSERT Data ${_tableInsert} success!`);
                             updateStatus(_tableInsert, 'Completed');
-                            AddLog(_tableInsert, info.id , moment().format());
+                            AddLog(_tableInsert, info.id, moment().format() + 'Z');
                         }
                     }
                 });
@@ -437,7 +441,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
 
 function AddLog(_enrollment_id, _response_data, _time_stamp) {
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
         request.query(`INSERT INTO [dbo].[Log]
         ([enrollment_id]
@@ -447,7 +451,7 @@ function AddLog(_enrollment_id, _response_data, _time_stamp) {
             ${_enrollment_id},
             '${_response_data}',
             '${_time_stamp}'
-        )`, function (erre, recordset) {
+        )`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -461,15 +465,15 @@ function AddLog(_enrollment_id, _response_data, _time_stamp) {
 };
 
 function updateStatus(enrollment_id, st) {
-    console.log(enrollment_id, typeof (enrollment_id), st, typeof (st));
+    console.log(enrollment_id, typeof(enrollment_id), st, typeof(st));
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
         request.query(`
             UPDATE dbo.Customers
             SET status='${st}'
             WHERE enrollment_id=${enrollment_id}
-        `, function (erre, recordset) {
+        `, function(erre, recordset) {
             if (erre) {
                 console.log(erre);
                 connection.close();
@@ -484,9 +488,9 @@ function updateStatus(enrollment_id, st) {
 function getCustomers() {
     console.log('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE status='Completed' AND isDelete='false'`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE status='Completed' AND isDelete='false'`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -494,7 +498,7 @@ function getCustomers() {
                 connection.close();
                 var Customer = recordset.recordset;
                 console.log(Customer);
-                Customer.forEach(function (_item) {
+                Customer.forEach(function(_item) {
                     console.log(_item.enrollment_id);
                     var Token = _item.api_key;
                     var enrollment_id = _item.enrollment_id;
@@ -517,9 +521,9 @@ function getCustomerByID(_enrollmentId) {
     console.log('GET customers info in progress....');
     sendLog(`GET data ${_enrollmentId}`);
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_id=${_enrollmentId}`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_id=${_enrollmentId}`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 sendLog(`GET data ${_enrollmentId}`);

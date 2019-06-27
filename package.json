@@ -10,6 +10,7 @@
     "node": "~0.10.0 || ~4.2.0"
   },
   "dependencies": {
+    "applicationinsights": "^1.4.0",
     "azure-arm-consumption": "^6.3.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",

@@ -183,6 +183,7 @@ app.post('/delcustomer', (req, res) => {
                 });
                 connection.close();
             } else {
+                deleteTable(req.body.enrollment_id);
                 res.json({
                     status: 200,
                     data: 'delete'
@@ -321,6 +322,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             result[i].consumption_cost = consuc;
             result[i]['azureconsumptionId'] = info.id;
         }
+
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);
         connection.connect().then(function() {
@@ -464,6 +466,7 @@ function AddLog(_enrollment_id, _response_data, _time_stamp) {
     });
 };
 
+
 function updateStatus(enrollment_id, st) {
     console.log(enrollment_id, typeof(enrollment_id), st, typeof(st));
     var connection = new sql.ConnectionPool(sqlConfig);
@@ -474,6 +477,23 @@ function updateStatus(enrollment_id, st) {
             SET status='${st}'
             WHERE enrollment_id=${enrollment_id}
         `, function(erre, recordset) {
+            if (erre) {
+                console.log(erre);
+                connection.close();
+            } else {
+                console.log(recordset);
+                connection.close();
+            }
+        });
+    });
+};
+
+function deleteTable(enrollment_id) {
+    // console.log(enrollment_id, typeof(enrollment_id), st, typeof(st));
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function() {
+        var request = new sql.Request(connection);
+        request.query(`drop table dbo.[${enrollment_id}]`, function(erre, recordset) {
             if (erre) {
                 console.log(erre);
                 connection.close();

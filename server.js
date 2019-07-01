@@ -168,27 +168,20 @@ app.post('/addcustomers', (req, res) => {
     });
 });
 app.post('/delcustomer', (req, res) => {
+    console.log(req)
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`
-            UPDATE dbo.Customers
-            SET isDelete='true'
-            WHERE id=${req.body.id}
-        `, function(erre, recordset) {
+        request.query(`drop table dbo.[${req.body.enrollment_id}]`, function(erre, recordset) {
             if (erre) {
-                res.json({
-                    status: 'error',
-                    data: erre
-                });
+                console.log(erre);
+                deleteTable(req.body.id);
                 connection.close();
             } else {
-                deleteTable(req.body.enrollment_id);
-                res.json({
-                    status: 200,
-                    data: 'delete'
-                });
+                deleteTable(req.body.id);
+                console.log(recordset);
                 connection.close();
+
             }
         });
     });
@@ -322,12 +315,12 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             result[i].consumption_cost = consuc;
             result[i]['azureconsumptionId'] = info.id;
         }
-
-        var infoText = JSON.stringify(result);
-        var connection = new sql.ConnectionPool(sqlConfig);
-        connection.connect().then(function() {
-            var request = new sql.Request(connection);
-            request.query(`USE [AzureConsumption]
+        if (result.length) {
+            var infoText = JSON.stringify(result);
+            var connection = new sql.ConnectionPool(sqlConfig);
+            connection.connect().then(function() {
+                var request = new sql.Request(connection);
+                request.query(`USE [AzureConsumption]
             DECLARE @jsonVariable NVARCHAR(MAX)
             SET @jsonVariable = N'${infoText}'
             INSERT INTO [dbo].[${_tableInsert}]
@@ -417,27 +410,27 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                     costCenter nvarchar(255),
                     unitOfMeasure nvarchar(255),
                     resourceGroup nvarchar(255))`,
-                function(erre, recordset) {
-                    if (erre) {
-                        console.log('ERROR: ', erre);
-                        updateStatus(_tableInsert, 'Failure');
-                        sendLog(`INSERT Data ${_tableInsert}  ERROR: ${erre}`);
-                        AddLog(_tableInsert, erre, moment().format());
-                        connection.close();
-                    } else {
-                        console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);
-                        connection.close();
-                        if (info.nextLink) {
-                            getAllData(info.nextLink, _tokeninput, _tableInsert, _markup);
+                    function(erre, recordset) {
+                        if (erre) {
+                            console.log('ERROR: ', erre);
+                            updateStatus(_tableInsert, 'Failure');
+                            sendLog(`INSERT Data ${_tableInsert}  ERROR: ${erre}`);
+                            AddLog(_tableInsert, erre, moment().format());
+                            connection.close();
                         } else {
-                            sendLog(`INSERT Data ${_tableInsert} success!`);
-                            updateStatus(_tableInsert, 'Completed');
-                            AddLog(_tableInsert, info.id, moment().format() + 'Z');
+                            console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);
+                            connection.close();
+                            if (info.nextLink) {
+                                getAllData(info.nextLink, _tokeninput, _tableInsert, _markup);
+                            } else {
+                                sendLog(`INSERT Data ${_tableInsert} success!`);
+                                updateStatus(_tableInsert, 'Completed');
+                                AddLog(_tableInsert, info.id, moment().format() + 'Z');
+                            }
                         }
-                    }
-                });
-        });
-
+                    });
+            });
+        }
     });
 };
 
@@ -489,16 +482,19 @@ function updateStatus(enrollment_id, st) {
 };
 
 function deleteTable(enrollment_id) {
-    // console.log(enrollment_id, typeof(enrollment_id), st, typeof(st));
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`drop table dbo.[${enrollment_id}]`, function(erre, recordset) {
+        request.query(`
+            UPDATE dbo.Customers
+            SET isDelete='true'
+            WHERE id=${enrollment_id}
+        `, function(erre, recordset) {
             if (erre) {
-                console.log(erre);
+                console.log(erre)
                 connection.close();
             } else {
-                console.log(recordset);
+                console.log(recordset)
                 connection.close();
             }
         });

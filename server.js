@@ -175,11 +175,13 @@ app.post('/delcustomer', (req, res) => {
         request.query(`drop table dbo.[${req.body.enrollment_id}]`, function(erre, recordset) {
             if (erre) {
                 console.log(erre);
-                deleteTable(req.body.id);
+                // deleteTable(req.body.id);
+                res.json(erre);
                 connection.close();
             } else {
                 deleteTable(req.body.id);
                 console.log(recordset);
+                res.json(recordset);
                 connection.close();
 
             }

@@ -169,6 +169,7 @@ app.post('/addcustomers', (req, res) => {
     });
 });
 app.post('/delcustomer', (req, res) => {
+    // deleteTable(req.body.id);
     console.log(req)
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function() {
@@ -285,32 +286,20 @@ function createtable(_customerData) {
     });
 }
 
-function precision(a) {
-    if (!isFinite(a)) return 0;
-    var e = 1,
-        p = 0;
-    while (Math.round(a * e) / e !== a) {
-        e *= 10;
-        p++;
-    }
-    return p;
-}
-
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
-    // sendLog(`GET Data ${_tableInsert} in progress....`);
-    console.log(_urllink, _tokeninput, _tableInsert, _markup);
-
+    // console.log(_urllink, _tokeninput, _tableInsert, _markup);
+    var AuthorizationKey = `bearer ${_tokeninput}`;
     request({
         method: 'GET',
         url: _urllink,
         headers: {
             'accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `bearer ${_tokeninput}`
+            'Authorization': AuthorizationKey
         }
     }, function(_error, _response, body) {
         console.log('GET Consumption id response');
-        console.log(_error, _response, body);
+        // console.log(_error, _response, body);
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {

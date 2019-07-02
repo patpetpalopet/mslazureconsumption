@@ -10,6 +10,7 @@ var moment = require('moment');
 const appInsights = require("applicationinsights");
 appInsights.setup("c908f080-bab0-4370-af22-32d5a754f598");
 appInsights.start();
+
 // schedule Job utc0
 var j = schedule.scheduleJob('0 0 0 * * *', function() {
     getCustomers();
@@ -24,8 +25,8 @@ function sendLog(text) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         auth: {
-            bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM',
-            // bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk', 
+            // bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM',
+            bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk',
         },
         form: {
             message: text, //ข้อความที่จะส่ง
@@ -183,7 +184,6 @@ app.post('/delcustomer', (req, res) => {
                 console.log(recordset);
                 res.json(recordset);
                 connection.close();
-
             }
         });
     });
@@ -299,13 +299,14 @@ function precision(a) {
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     // sendLog(`GET Data ${_tableInsert} in progress....`);
     console.log(_urllink, _tokeninput, _tableInsert, _markup);
+
     request({
         method: 'GET',
         url: _urllink,
         headers: {
             'accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${_tokeninput}`
+            'Authorization': `bearer ${_tokeninput}`
         }
     }, function(_error, _response, body) {
         console.log('GET Consumption id response');
@@ -317,7 +318,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
             result[i].consumption_cost = consuc;
             result[i]['azureconsumptionId'] = info.id;
         }
-        if (result.length) {
+        if (result) {
             var infoText = JSON.stringify(result);
             var connection = new sql.ConnectionPool(sqlConfig);
             connection.connect().then(function() {
@@ -427,11 +428,14 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                             } else {
                                 sendLog(`INSERT Data ${_tableInsert} success!`);
                                 updateStatus(_tableInsert, 'Completed');
-                                AddLog(_tableInsert, info.id, moment().format() + 'Z');
+                                AddLog(_tableInsert, info.id, moment().format());
                             }
                         }
                     });
             });
+        } else {
+            updateStatus(_tableInsert, 'Failure');
+            sendLog(`INSERT Data ${_tableInsert}  ERROR: ${_error}`);
         }
     });
 };
@@ -557,7 +561,7 @@ function getCustomerByID(_enrollmentId) {
                 var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
                 var months = moment(endTime).diff(moment(startTime), 'months', true);
                 console.log(months);
-                if (months > 27) {
+                if (months > 35) {
                     endTime = moment(Customer.enddate).format('YYYY-MM-DD');
                 }
                 var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;

@@ -170,7 +170,7 @@ app.post('/addcustomers', (req, res) => {
 });
 app.post('/delcustomer', (req, res) => {
     // deleteTable(req.body.id);
-    console.log(req)
+    // console.log(req)
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function() {
         var request = new sql.Request(connection);
@@ -407,7 +407,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                             console.log('ERROR: ', erre);
                             updateStatus(_tableInsert, 'Failure');
                             sendLog(`INSERT Data ${_tableInsert}  ERROR: ${erre}`);
-                            AddLog(_tableInsert, erre, moment().format());
+                            AddLog(_tableInsert, erre, moment().format('YYYY-MM-DDTHH:mm:ss') + 'Z');
                             connection.close();
                         } else {
                             console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);
@@ -417,7 +417,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                             } else {
                                 sendLog(`INSERT Data ${_tableInsert} success!`);
                                 updateStatus(_tableInsert, 'Completed');
-                                AddLog(_tableInsert, info.id, moment().format());
+                                AddLog(_tableInsert, info.id, moment().format('YYYY-MM-DDTHH:mm:ss') + 'Z');
                             }
                         }
                     });
@@ -430,6 +430,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
 };
 
 function AddLog(_enrollment_id, _response_data, _time_stamp) {
+    console.log(_enrollment_id, _response_data, _time_stamp);
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function() {
         var request = new sql.Request(connection);

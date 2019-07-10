@@ -295,7 +295,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         url: _urllink,
         headers: {
             'accept': 'application/json',
-            // 'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
             'Authorization': AuthorizationKey
         }
     }, function(_error, _response, body) {

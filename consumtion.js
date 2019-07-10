@@ -20,7 +20,7 @@ var sqlConfig = {
 function createdTable(_tableName) {
     console.log('Created table in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
         request.query(`CREATE TABLE dbo.[${_tableName}](
                        serviceName nvarchar(128),
@@ -64,7 +64,7 @@ function createdTable(_tableName) {
                        costCenter nvarchar(128),
                        unitOfMeasure nvarchar(128),
                        resourceGroup nvarchar(128))
-            `, function (erre, res) {
+            `, function(erre, res) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -84,9 +84,11 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         url: _urllink,
         headers: {
             'accept': 'application/json',
-            'Authorization': `bearer ${_tokeninput}`
+        },
+        auth: {
+            bearer: _tokeninput
         }
-    }, function (_error, _response, body) {
+    }, function(_error, _response, body) {
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
@@ -94,7 +96,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
         }
         var infoText = JSON.stringify(result);
         var connection = new sql.ConnectionPool(sqlConfig);
-        connection.connect().then(function () {
+        connection.connect().then(function() {
             var request = new sql.Request(connection);
             request.query(`USE [AzureConsumption]
             DECLARE @jsonVariable NVARCHAR(MAX)
@@ -184,7 +186,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                        costCenter nvarchar(128),
                        unitOfMeasure nvarchar(128),
                        resourceGroup nvarchar(128))`,
-                function (erre, recordset) {
+                function(erre, recordset) {
                     if (erre) {
                         console.log('ERROR: ', erre);
                         connection.close();
@@ -204,9 +206,9 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
 function getCustomers() {
     console.log('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_status!='Inactive' AND isDelete='false'`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_status!='Inactive' AND isDelete='false'`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -214,7 +216,7 @@ function getCustomers() {
                 connection.close();
                 var Customer = recordset.recordset;
                 console.log(Customer);
-                Customer.forEach(function (_item) {
+                Customer.forEach(function(_item) {
                     console.log(_item.enrollment_id);
                     var Token = _item.api_key;
                     var enrollment_id = _item.enrollment_id;
@@ -235,9 +237,9 @@ function getCustomers() {
 function getCustomerByID(_idcus) {
     console.log('GET customers info in progress....');
     var connection = new sql.ConnectionPool(sqlConfig);
-    connection.connect().then(function () {
+    connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE id=${_idcus}`, function (erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE id=${_idcus}`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();

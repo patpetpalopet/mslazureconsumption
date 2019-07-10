@@ -288,15 +288,13 @@ function createtable(_customerData) {
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     // console.log(_urllink, _tokeninput, _tableInsert, _markup);
-    var AuthorizationKey = `bearer ${_tokeninput}`;
-    console.log(AuthorizationKey);
     request({
         method: 'GET',
         url: _urllink,
         headers: {
             'accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': AuthorizationKey
+            'Authorization': `bearer ${_tokeninput}`
         }
     }, function(_error, _response, body) {
         console.log('GET Consumption id response');

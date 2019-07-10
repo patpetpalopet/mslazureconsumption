@@ -1,4 +1,4 @@
-var http = require('http');
+// var http = require('http');
 var express = require('express');
 var sql = require('mssql');
 var bodyParser = require('body-parser');
@@ -7,12 +7,12 @@ var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
 
-const appInsights = require("applicationinsights");
-appInsights.setup("c908f080-bab0-4370-af22-32d5a754f598");
-appInsights.start();
+// const appInsights = require("applicationinsights");
+// appInsights.setup("c908f080-bab0-4370-af22-32d5a754f598");
+// appInsights.start();
 
 // schedule Job utc0
-var j = schedule.scheduleJob('0 0 0 * * *', function() {
+var j = schedule.scheduleJob('0 24 12 * * *', function() {
     getCustomers();
     // sendLog(`=========================================================================`);
 });
@@ -25,8 +25,8 @@ function sendLog(text) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         auth: {
-            // bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM',
-            bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk',
+            bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM',
+            // bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk',
         },
         form: {
             message: text, //ข้อความที่จะส่ง
@@ -289,17 +289,21 @@ function createtable(_customerData) {
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     // console.log(_urllink, _tokeninput, _tableInsert, _markup);
     var AuthorizationKey = `bearer ${_tokeninput}`;
+    console.log(AuthorizationKey);
     request({
         method: 'GET',
         url: _urllink,
         headers: {
             'accept': 'application/json',
-            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/json',
             'Authorization': AuthorizationKey
         }
     }, function(_error, _response, body) {
         console.log('GET Consumption id response');
-        // console.log(_error, _response, body);
+        if (_error) {
+            AddLog(_tableInsert, _error, moment().format('YYYY-MM-DDTHH:mm:ss') + 'Z');
+            // console.log(_error, _response, body);
+        }
         var info = JSON.parse(body);
         var result = info.data;
         for (var i in info.data) {
@@ -423,8 +427,9 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                     });
             });
         } else {
+            console.log(info)
             updateStatus(_tableInsert, 'Failure');
-            sendLog(`INSERT Data ${_tableInsert}  ERROR: ${_error}`);
+            sendLog(`INSERT Data ${_tableInsert}  ERROR: ${info.error.message}`);
         }
     });
 };
@@ -509,7 +514,7 @@ function getCustomers() {
             } else {
                 connection.close();
                 var Customer = recordset.recordset;
-                console.log(Customer);
+                // console.log(Customer);
                 Customer.forEach(function(_item) {
                     console.log(_item.enrollment_id);
                     var Token = _item.api_key;

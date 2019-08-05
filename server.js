@@ -542,7 +542,7 @@ function getCustomerByID(_enrollmentId) {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_id=${_enrollmentId}`, function(erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE enrollment_id=${_enrollmentId} AND isDelete='false'`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 sendLog(`GET data ${_enrollmentId}`);

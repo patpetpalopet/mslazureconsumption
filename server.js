@@ -52,7 +52,7 @@ var sqlConfig = {
     pool: {
         max: 10,
         min: 0,
-        idleTimeoutMillis: 5
+        idleTimeoutMillis: 1440
     }
 };
 
@@ -287,15 +287,16 @@ function createtable(_customerData) {
 }
 
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
+    console.log(_urllink);
     request({
         method: 'GET',
         url: _urllink,
         headers: {
             'accept': 'application/json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         auth: {
-            bearer: AuthorizationKey, //token
+            bearer: _tokeninput.toString().trim()
         }
     }, function(_error, _response, body) {
         console.log('GET Consumption id response');

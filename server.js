@@ -139,6 +139,7 @@ app.post('/addcustomers', (req, res) => {
             [markup], 
             [api_key], 
             [status], 
+            [updated], 
             [api_key_expire], 
             [isActive], 
             [isDelete]
@@ -151,6 +152,7 @@ app.post('/addcustomers', (req, res) => {
             ${req.body.markup},
             '${req.body.api_key}',
             '${req.body.status}',
+            ${null},
             '${req.body.api_key_expire}',
             '${req.body.isActive}',
             '${req.body.isDelete}'
@@ -222,6 +224,23 @@ app.post('/updatecustomer', (req, res) => {
     });
 });
 
+function updated(customer_id) {
+    console.log('customer_id', customer_id);
+    var connection = new sql.ConnectionPool(sqlConfig);
+    connection.connect().then(function() {
+        var request = new sql.Request(connection);
+        request.query(`
+            UPDATE dbo.Customers
+            SET updated='${moment().subtract(1, 'days').format('YYYY-MM-DDTHH:mm:ss') + 'Z'}',
+            WHERE id=${customer_id}
+        `, function(erre, recordset) {
+            if (erre) {
+                console.log(erre);
+            } else {}
+        });
+    });
+};
+
 function createtable(_customerData) {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function() {
@@ -288,8 +307,8 @@ function createtable(_customerData) {
 
 // "message":"Error on authorization" = invalid token 
 // Invalid character in header content ["authorization"] = invalid token
-function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
-    console.log(_urllink);
+function getAllData(_urllink, _tokeninput, _tableInsert, _markup, id) {
+    console.log('getAllData', id);
     request({
         method: 'GET',
         url: _urllink,
@@ -419,10 +438,11 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
                             console.log(`INSERT ${recordset.rowsAffected[1]} records success! in ${_tableInsert}`);
                             connection.close();
                             if (info.nextLink) {
-                                getAllData(info.nextLink, _tokeninput, _tableInsert, _markup);
+                                getAllData(info.nextLink, _tokeninput, _tableInsert, _markup, id);
                             } else {
                                 sendLog(`INSERT Data ${_tableInsert} success!`);
                                 updateStatus(_tableInsert, 'Completed');
+                                // updated(id);
                                 AddLog(_tableInsert, info.id, moment().format('YYYY-MM-DDTHH:mm:ss') + 'Z');
                             }
                         }
@@ -509,7 +529,7 @@ function getCustomers() {
     var connection = new sql.ConnectionPool(sqlConfig);
     connection.connect().then(function() {
         var request = new sql.Request(connection);
-        request.query(`SELECT * FROM dbo.Customers WHERE status='Completed' AND isDelete='false'`, function(erre, recordset) {
+        request.query(`SELECT * FROM dbo.Customers WHERE status='Completed' AND enrollment_status='Active' AND isDelete='false'`, function(erre, recordset) {
             if (erre) {
                 console.log('ERROR: ', erre);
                 connection.close();
@@ -528,7 +548,7 @@ function getCustomers() {
                     var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
                     Url += `startTime=${endTime}&endTime=${endTime}`;
                     sendLog(`GET data ${enrollment_id} success!`);
-                    getAllData(Url, Token, enrollment_id, markup);
+                    getAllData(Url, Token, enrollment_id, markup, _item.id);
                 });
 
             }
@@ -554,17 +574,16 @@ function getCustomerByID(_enrollmentId) {
                 var Token = Customer.api_key;
                 var enrollment_id = Customer.enrollment_id;
                 var markup = Customer.markup;
-                // var startTime = moment(Customer.startdate).format('YYYY-MM-DD');
+                var startTime = moment(Customer.startdate).format('YYYY-MM-DD');
                 var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
-                var startTime = moment().subtract(36, 'months').format('YYYY-MM-DD');
                 var months = moment(endTime).diff(moment(startTime), 'months', true);
-                console.log(Customer.startdate, Customer.enddate, months);
+                // console.log(Customer.startdate, Customer.enddate, months);
                 if (months > 36) {
                     endTime = moment(Customer.enddate).format('YYYY-MM-DD');
                 }
                 var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;
                 Url += `startTime=${startTime}&endTime=${endTime}`;
-                getAllData(Url, Token, enrollment_id, markup);
+                getAllData(Url, Token, enrollment_id, markup, Customer.id);
             }
         });
     });

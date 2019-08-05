@@ -12,7 +12,7 @@ var moment = require('moment');
 // appInsights.start();
 
 // schedule Job utc0
-var j = schedule.scheduleJob('0 24 12 * * *', function() {
+var j = schedule.scheduleJob('0 0 0 * * *', function() {
     getCustomers();
     // sendLog(`=========================================================================`);
 });
@@ -286,6 +286,8 @@ function createtable(_customerData) {
     });
 }
 
+// "message":"Error on authorization" = invalid token 
+// Invalid character in header content ["authorization"] = invalid token
 function getAllData(_urllink, _tokeninput, _tableInsert, _markup) {
     console.log(_urllink);
     request({
@@ -552,11 +554,12 @@ function getCustomerByID(_enrollmentId) {
                 var Token = Customer.api_key;
                 var enrollment_id = Customer.enrollment_id;
                 var markup = Customer.markup;
-                var startTime = moment(Customer.startdate).format('YYYY-MM-DD');
+                // var startTime = moment(Customer.startdate).format('YYYY-MM-DD');
                 var endTime = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                var startTime = moment().subtract(36, 'months').format('YYYY-MM-DD');
                 var months = moment(endTime).diff(moment(startTime), 'months', true);
-                console.log(months);
-                if (months > 35) {
+                console.log(Customer.startdate, Customer.enddate, months);
+                if (months > 36) {
                     endTime = moment(Customer.enddate).format('YYYY-MM-DD');
                 }
                 var Url = `https://consumption.azure.com/v3/enrollments/${enrollment_id}/usagedetailsbycustomdate?`;

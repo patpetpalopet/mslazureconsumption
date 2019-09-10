@@ -7,16 +7,16 @@ var app = express();
 var schedule = require('node-schedule');
 var moment = require('moment');
 
-// const appInsights = require("applicationinsights");
-// appInsights.setup("c908f080-bab0-4370-af22-32d5a754f598");
-// appInsights.start();
+const appInsights = require("applicationinsights");
+appInsights.setup("c908f080-bab0-4370-af22-32d5a754f598");
+appInsights.start();
 
 // schedule Job utc0
 var j = schedule.scheduleJob('0 0 0 * * *', function() {
     getCustomers();
     // sendLog(`=========================================================================`);
 });
-
+// C:\Users\PrimoGod\Desktop\mscrootcert.cer
 function sendLog(text) {
     request({
         method: 'POST',
@@ -44,7 +44,7 @@ function sendLog(text) {
 var sqlConfig = {
     user: 'metro',
     password: 'P@ssw0rd',
-    server: 'mslazureconsumption.database.windows.net',
+    server: 'mslconsumption.database.windows.net',
     database: 'AzureConsumption',
     options: {
         encrypt: true

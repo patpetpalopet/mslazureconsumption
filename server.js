@@ -25,8 +25,7 @@ function sendLog(text) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         auth: {
-            bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM',
-            // bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk',
+            bearer: 'BDkykDSR6KrMm17PPMeIGYWN7rKoAgZpIXwdndKNPT8'
         },
         form: {
             message: text, //ข้อความที่จะส่ง

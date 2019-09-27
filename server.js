@@ -322,6 +322,7 @@ function getAllData(_urllink, _tokeninput, _tableInsert, _markup, id) {
         console.log('GET Consumption id response');
         if (_error) {
             AddLog(_tableInsert, _error, moment().format('YYYY-MM-DDTHH:mm:ss') + 'Z');
+            sendLog(`INSERT Data ${_tableInsert} error! ${JSON.stringify(_error)} `);
             // console.log(_error, _response, body);
         }
         var info = JSON.parse(body);

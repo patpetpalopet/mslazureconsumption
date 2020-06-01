@@ -26,7 +26,6 @@ function sendLog(text) {
         },
         auth: {
             bearer: 'bocXxg3buRE1Zmry34RedGFRh6DTD2U5omO4aKPBlGM',
-            // bearer: 'xrzR8tzdmn8vklmFQQ9Lzf0NztNnX4Yycya6wmd1QWk',
         },
         form: {
             message: text, //ข้อความที่จะส่ง
@@ -66,7 +65,7 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Content-Type, X-access-token");
     res.header("Access-Control-Allow-Headers", "Content-Type, application/json");
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
-    res.header("Access-Control-Allow-Credentials", true);
+    // res.header("Access-Control-Allow-Credentials", true);
     next();
 });
 
